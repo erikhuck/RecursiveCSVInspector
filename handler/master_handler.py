@@ -3,7 +3,7 @@
 from argparse import ArgumentParser, Namespace
 
 from handler.extract_handler import ExtractHandler
-from strings.handler import EXTRACT_HANDLER_NAME, SUB_PARSER
+from strings.args import EXTRACT_HANDLER_NAME, SUB_PARSER
 
 
 class MasterHandler:

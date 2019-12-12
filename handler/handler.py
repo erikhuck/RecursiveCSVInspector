@@ -2,7 +2,7 @@
 
 from argparse import ArgumentParser, Namespace
 
-from strings.handler import DATA_PATH_ARG, DATA_PATH_ARG_HELP, STORE_ACTION
+from strings.args import DATA_PATH_ARG, DATA_PATH_ARG_HELP, STORE_ACTION
 
 
 class Handler:

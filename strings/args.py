@@ -1,4 +1,4 @@
-"""Module containing the strings used primarily by the handler package"""
+"""Module containing the strings used for command line argument parsing"""
 
 DATA_PATH_ARG = '--data-path'
 DATA_PATH_ARG_HELP = 'The path to the data to query'
