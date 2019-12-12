@@ -1,1 +1,4 @@
-ADNI_basic_data*
+ADNI_data*
+.idea
+*__pycache__*
+env
