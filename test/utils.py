@@ -1,7 +1,7 @@
 """Module containing functionality used for a number of different tests"""
 
-from os import mkdir, system
-from os.path import isdir, isfile, join, split
+from os import chdir, getcwd, mkdir, system
+from os.path import isdir, isfile, join, realpath, split
 from pandas import DataFrame
 
 from handler.master_handler import MasterHandler
@@ -238,8 +238,11 @@ class TestDataCreator:
         assert isdir(dest_dir)
 
         dir_name: str = split(dir_path)[-1]
-        command: str = compress_command.format(dest_dir, dir_name)
-        system(command)
+        command: str = compress_command.format(dir_name)
+
+        with NewWorkingDir(new_working_dir=dest_dir):
+            system(command)
+
         TestDataCreator._remove_dir(dir_path=dir_path)
 
     @staticmethod
@@ -260,6 +263,26 @@ class TestDataCreator:
 
         TestDataCreator._remove_dir(dir_path=TEST_DATA_PATH)
         self._test_data_paths: set = set()
+
+
+class NewWorkingDir:
+    """A context that changes the working directory upon entering and restores the working directory upon exiting"""
+
+    def __init__(self, new_working_dir: str):
+        assert isdir(new_working_dir)
+
+        self._old_working_dir: str = getcwd()
+        self._new_working_dir: str = realpath(new_working_dir)
+
+    def __enter__(self):
+        """Changes the working directory to the new working directory"""
+
+        chdir(self._new_working_dir)
+
+    def __exit__(self, *args):
+        """Changes the working directory back to the original working directory"""
+
+        chdir(self._old_working_dir)
 
 
 def get_master_handler(handler_type: str) -> MasterHandler:
