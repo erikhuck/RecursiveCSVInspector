@@ -6,10 +6,10 @@ from unittest import TestLoader, TestSuite, TextTestRunner
 
 from strings.general import TEST_DIR, MAIN_NAME
 
-# system('apt install bash')
-system('echo $SHELL')
-system('SHELL=/bin/bash')
-system('echo $SHELL')
+system('pwd')
+system('cd')
+system('pwd')
+exit(0)
 
 if __name__ == MAIN_NAME:
     test_runner: TextTestRunner = TextTestRunner(verbosity=1)
