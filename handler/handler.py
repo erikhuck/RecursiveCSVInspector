@@ -12,14 +12,18 @@ class Handler:
     def configure_parser(parser: ArgumentParser):
         """
         Configures the base arguments that apply to all handlers that extend the handler base class
+
         @param parser: The parser to add the base arguments to
         """
-        parser.add_argument(DATA_PATH_ARG, type=str, action=STORE_ACTION, help=DATA_PATH_ARG_HELP)
+
+        parser.add_argument(DATA_PATH_ARG, type=str, action=STORE_ACTION, required=True, help=DATA_PATH_ARG_HELP)
 
     @staticmethod
     def handle(args: Namespace):
         """
         All handlers have a handle function which performs their functionality
+
         @param args: The arguments for the handler which affect their functionality
         """
+
         raise NotImplementedError()
