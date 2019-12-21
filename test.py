@@ -6,6 +6,9 @@ from unittest import TestLoader, TestSuite, TextTestRunner
 
 from strings.general import TEST_DIR, MAIN_NAME
 
+# system('apt install bash')
+system('echo $SHELL')
+system('SHELL=/bin/bash')
 system('echo $SHELL')
 
 if __name__ == MAIN_NAME:
