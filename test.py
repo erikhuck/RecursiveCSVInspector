@@ -1,11 +1,12 @@
 """Module ran on the command line which runs all the tests"""
 
-from os import system
+from os import system, getcwd
 import sys
 from unittest import TestLoader, TestSuite, TextTestRunner
 
 from strings.general import TEST_DIR, MAIN_NAME
 
+print('PYTHON WD: {}'.format(getcwd()))
 system('pwd')
 system('cd')
 system('pwd')
