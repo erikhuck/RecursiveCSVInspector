@@ -6,7 +6,7 @@ from pandas import DataFrame
 
 from handler.master_handler import MasterHandler
 from strings.extract_handler import TAR_EXTENSION
-from strings.args import DATA_PATH_ARG
+from strings.args import DATA_PATH_ARG, KEY_WORDS_ARG
 from strings.general import CSV_EXTENSION
 from strings.test_data import (
     CSV1_NAME, CSV1_NOMINAL_FEAT1_NAME, CSV1_NOMINAL_FEAT1_VAL1, CSV1_NOMINAL_FEAT1_VAL2, CSV1_NOMINAL_FEAT1_VAL3,
@@ -285,11 +285,12 @@ class NewWorkingDir:
         chdir(self._old_working_dir)
 
 
-def get_master_handler(handler_type: str) -> MasterHandler:
+def get_master_handler(handler_type: str, extra_args: list = None) -> MasterHandler:
     """
     Creates a master handler with the given handler type, for the purpose of testing
 
     @param handler_type: The type of handler for the master handler to run
+    @param extra_args: The remaining arguments to add on to the base arguments
     @return: The master handler
     """
 
@@ -298,4 +299,23 @@ def get_master_handler(handler_type: str) -> MasterHandler:
         DATA_PATH_ARG, TEST_DATA_PATH
     ]
 
+    if extra_args is not None:
+        argv.extend(extra_args)
+
     return MasterHandler(argv)
+
+
+def get_inspect_args(key_words: list) -> list:
+    """
+    Creates the list of arguments especially for the inspect handler, for the purpose of testing
+
+    @param key_words: The list of key words to test the inspect handler with
+    @return: The inspect handler arguments
+    """
+
+    argv: list = [
+        KEY_WORDS_ARG
+    ]
+
+    argv.extend(key_words)
+    return argv

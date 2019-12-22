@@ -3,7 +3,8 @@
 from argparse import ArgumentParser, Namespace
 
 from handler.extract_handler import ExtractHandler
-from strings.args import EXTRACT_HANDLER_NAME, SUB_PARSER
+from handler.inspect_handler import InspectHandler
+from strings.args import EXTRACT_HANDLER_NAME, INSPECT_HANDLER_NAME, SUB_PARSER
 
 
 class MasterHandler:
@@ -18,7 +19,8 @@ class MasterHandler:
         extract_parser: ArgumentParser = subparsers.add_parser(EXTRACT_HANDLER_NAME)
         ExtractHandler.configure_parser(extract_parser)
 
-        # TODO: ADD PRINT PARSER
+        inspect_parser: ArgumentParser = subparsers.add_parser(INSPECT_HANDLER_NAME)
+        InspectHandler.configure_parser(inspect_parser)
 
         self.args: Namespace = parser.parse_args(argv)
 
@@ -27,6 +29,7 @@ class MasterHandler:
 
         handler_type: str = self.args.handler_type
 
-        # TODO: ADD PRINT HANDLER
         if handler_type == EXTRACT_HANDLER_NAME:
             ExtractHandler.handle(self.args)
+        elif handler_type == INSPECT_HANDLER_NAME:
+            InspectHandler.handle(self.args)
