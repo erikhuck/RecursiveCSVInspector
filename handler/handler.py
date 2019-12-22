@@ -1,6 +1,8 @@
 """Module for the handler base class"""
 
 from argparse import ArgumentParser, Namespace
+from os import walk
+from os.path import isdir, join
 
 from strings.args import DATA_PATH_ARG, DATA_PATH_ARG_HELP, STORE_ACTION
 
@@ -27,3 +29,26 @@ class Handler:
         """
 
         raise NotImplementedError()
+
+    @staticmethod
+    def _directory_walk(dir_path: str, action: callable):
+        """
+        Recursively walks through each file in a directory and its subdirectories, performing some action on them
+
+        @param dir_path: The path to the current directory in the current level of recursion
+        @param action: The action to perform on the files of the current directory
+        """
+
+        assert isdir(dir_path)
+
+        for root, _, files in walk(dir_path):
+            for file in files:
+                file_path: str = join(root, file)
+                action(root=root, file_path=file_path)
+            break
+
+        for root, directories, _ in walk(dir_path):
+            for directory in directories:
+                recursive_path: str = join(dir_path, directory)
+                Handler._directory_walk(dir_path=recursive_path, action=action)
+            break

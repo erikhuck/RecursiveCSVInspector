@@ -1,8 +1,8 @@
 """Module for the extract handler class"""
 
 from argparse import Namespace
-from os import walk, system
-from os.path import isdir, isfile, join
+from os import system
+from os.path import isdir, isfile
 
 from handler.handler import Handler
 from strings.extract_handler import (
@@ -22,37 +22,25 @@ class ExtractHandler(Handler):
         @param args: The arguments for the extract handler
         """
 
-        ExtractHandler._extract_files_in_directory(args.data_path)
+        Handler._directory_walk(dir_path=args.data_path, action=ExtractHandler._extract_file)
 
     @staticmethod
-    def _extract_files_in_directory(path: str):
+    def _extract_file(root: str, file_path: str):
         """
-        Recursively extracts the files and sub-directories of the current directory
+        Extracts a file in a directory
 
-        @param path: The path to the current directory in the current level of recursion
+        @param root: The directory that the file is in
+        @param file_path: The path to the file to extract
         """
 
-        assert isdir(path)
-
-        for root, _, files in walk(path):
-            for file in files:
-                file_path: str = join(root, file)
-
-                if GZ_EXTENSION in file_path and TAR_EXTENSION in file_path:
-                    ExtractHandler._extract_tar_gz(file_path=file_path, dest_dir=root)
-                elif GZ_EXTENSION in file_path:
-                    ExtractHandler._extract_gz(file_path=file_path)
-                elif TAR_EXTENSION in file_path:
-                    ExtractHandler._extract_tar(file_path=file_path, dest_dir=root)
-                elif ZIP_EXTENSION in file_path:
-                    ExtractHandler._extract_zip(file_path=file_path, dest_dir=root)
-            break
-
-        for root, directories, _ in walk(path):
-            for directory in directories:
-                recursive_path: str = join(path, directory)
-                ExtractHandler._extract_files_in_directory(recursive_path)
-            break
+        if GZ_EXTENSION in file_path and TAR_EXTENSION in file_path:
+            ExtractHandler._extract_tar_gz(file_path=file_path, dest_dir=root)
+        elif GZ_EXTENSION in file_path:
+            ExtractHandler._extract_gz(file_path=file_path)
+        elif TAR_EXTENSION in file_path:
+            ExtractHandler._extract_tar(file_path=file_path, dest_dir=root)
+        elif ZIP_EXTENSION in file_path:
+            ExtractHandler._extract_zip(file_path=file_path, dest_dir=root)
 
     @staticmethod
     def _extract_gz(file_path: str):
