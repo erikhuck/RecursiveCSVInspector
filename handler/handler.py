@@ -44,7 +44,7 @@ class Handler:
         for root, _, files in walk(dir_path):
             for file in files:
                 file_path: str = join(root, file)
-                action(root=root, file_path=file_path)
+                action(root, file_path)
             break
 
         for root, directories, _ in walk(dir_path):

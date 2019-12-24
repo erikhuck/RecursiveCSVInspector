@@ -3,7 +3,7 @@
 from argparse import ArgumentParser, Namespace
 
 from handler.extract_handler import ExtractHandler
-from handler.inspect_handler import InspectHandler
+from handler.inspect_handler.inspect_handler import InspectHandler
 from strings.args import EXTRACT_HANDLER_NAME, INSPECT_HANDLER_NAME, SUB_PARSER
 
 
