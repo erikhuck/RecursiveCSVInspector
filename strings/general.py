@@ -1,5 +1,6 @@
 """Module containing strings for general purposes"""
 
-CSV_EXTENSION = '.csv'
-MAIN_NAME = '__main__'
-TEST_DIR = 'test'
+CSV_EXTENSION: str = '.csv'
+EMPTY_STRING: str = ''
+MAIN_NAME: str = '__main__'
+TEST_DIR: str = 'test'

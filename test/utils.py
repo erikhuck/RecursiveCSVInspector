@@ -10,10 +10,14 @@ from strings.args import DATA_PATH_ARG, KEY_WORDS_ARG
 from strings.general import CSV_EXTENSION
 from strings.test_data import (
     CSV1_NAME, CSV1_NOMINAL_FEAT1_NAME, CSV1_NOMINAL_FEAT1_VAL1, CSV1_NOMINAL_FEAT1_VAL2, CSV1_NOMINAL_FEAT1_VAL3,
-    CSV1_NOMINAL_FEAT2_NAME, CSV1_NOMINAL_FEAT2_VAL, CSV1_REAL_FEAT_NAME, CSV1_REAL_FEAT_VAL1, CSV1_REAL_FEAT_VAL2,
-    CSV1_REAL_FEAT_VAL3, CSV1_REAL_FEAT_VAL4, CSV2_NAME, CSV3_NAME, DIR1_NAME, DIR2_NAME, DIR2A_NAME, DIR2A1_NAME,
-    DIR3_NAME, DIR3A_NAME, EMPTY_DIR_NAME, GZ_COMPRESS_COMMAND, REMOVE_DIR_COMMAND, TAR_COMPRESS_COMMAND,
-    TEST_DATA_PATH, TXT_EXTENSION, TXT1_NAME, TXT2_NAME, ZIP_COMPRESS_COMMAND
+    CSV1_NOMINAL_FEAT2_NAME, CSV1_NOMINAL_FEAT2_VAL, CSV1_NUMERIC_FEAT_NAME, CSV1_NUMERIC_FEAT_VAL1,
+    CSV1_NUMERIC_FEAT_VAL2, CSV1_NUMERIC_FEAT_VAL3, CSV1_NUMERIC_FEAT_VAL4, CSV2_NAME, CSV2_NUMERIC_FEAT1_NAME,
+    CSV2_NUMERIC_FEAT1_VAL1, CSV2_NUMERIC_FEAT1_VAL2, CSV2_NUMERIC_FEAT2_NAME, CSV2_NUMERIC_FEAT2_VAL1,
+    CSV2_NUMERIC_FEAT2_VAL2, CSV3_NAME, CSV3_NOMINAL_FEAT_NAME, CSV3_NOMINAL_FEAT_VAL1, CSV3_NOMINAL_FEAT_VAL2,
+    CSV3_NOMINAL_FEAT_VAL3, CSV3_NUMERIC_FEAT_NAME, CSV3_NUMERIC_FEAT_VAL1, CSV3_NUMERIC_FEAT_VAL2,
+    CSV3_NUMERIC_FEAT_VAL3, DIR1_NAME, DIR2_NAME, DIR2A_NAME, DIR2A1_NAME, DIR3_NAME, DIR3A_NAME, EMPTY_DIR_NAME,
+    GZ_COMPRESS_COMMAND, REMOVE_DIR_COMMAND, TAR_COMPRESS_COMMAND, TEST_DATA_PATH, TXT_EXTENSION, TXT1_NAME, TXT2_NAME,
+    ZIP_COMPRESS_COMMAND
 )
 
 
@@ -46,26 +50,23 @@ class TestDataCreator:
 
         mkdir(TEST_DATA_PATH)
 
-        csv1: DataFrame = DataFrame(
-            {
-                CSV1_NOMINAL_FEAT1_NAME: [
-                    CSV1_NOMINAL_FEAT1_VAL1, CSV1_NOMINAL_FEAT1_VAL3, CSV1_NOMINAL_FEAT1_VAL2, CSV1_NOMINAL_FEAT1_VAL2,
-                    CSV1_NOMINAL_FEAT1_VAL3, CSV1_NOMINAL_FEAT1_VAL2
-                ],
-                CSV1_NOMINAL_FEAT2_NAME: [
-                    CSV1_NOMINAL_FEAT2_VAL, CSV1_NOMINAL_FEAT2_VAL, CSV1_NOMINAL_FEAT2_VAL, CSV1_NOMINAL_FEAT2_VAL,
-                    CSV1_NOMINAL_FEAT2_VAL, CSV1_NOMINAL_FEAT2_VAL
-                ],
-                CSV1_REAL_FEAT_NAME: [
-                    CSV1_REAL_FEAT_VAL1, CSV1_REAL_FEAT_VAL3, CSV1_REAL_FEAT_VAL3, CSV1_REAL_FEAT_VAL4,
-                    CSV1_REAL_FEAT_VAL3, CSV1_REAL_FEAT_VAL2
-                ]
-            }
+        csv1_dict: dict = {
+            CSV1_NOMINAL_FEAT1_NAME: [
+                CSV1_NOMINAL_FEAT1_VAL1, CSV1_NOMINAL_FEAT1_VAL3, CSV1_NOMINAL_FEAT1_VAL2, CSV1_NOMINAL_FEAT1_VAL2,
+                CSV1_NOMINAL_FEAT1_VAL3, CSV1_NOMINAL_FEAT1_VAL2
+            ],
+            CSV1_NOMINAL_FEAT2_NAME: [
+                CSV1_NOMINAL_FEAT2_VAL, CSV1_NOMINAL_FEAT2_VAL, CSV1_NOMINAL_FEAT2_VAL, CSV1_NOMINAL_FEAT2_VAL,
+                CSV1_NOMINAL_FEAT2_VAL, CSV1_NOMINAL_FEAT2_VAL
+            ],
+            CSV1_NUMERIC_FEAT_NAME: [
+                CSV1_NUMERIC_FEAT_VAL1, CSV1_NUMERIC_FEAT_VAL3, CSV1_NUMERIC_FEAT_VAL3, CSV1_NUMERIC_FEAT_VAL4,
+                CSV1_NUMERIC_FEAT_VAL3, CSV1_NUMERIC_FEAT_VAL2
+            ]
+        }
+        TestDataCreator._make_csv(
+            csv_dict=csv1_dict, csv_dir=TEST_DATA_PATH, csv_name=CSV1_NAME, paths=self._test_data_paths
         )
-
-        csv1_path: str = join(TEST_DATA_PATH, CSV1_NAME + CSV_EXTENSION)
-        csv1.to_csv(csv1_path)
-        self._test_data_paths.add(csv1_path)
 
         dir1_paths: set = TestDataCreator._make_dir1(compress=compress)
         self._test_data_paths.update(dir1_paths)
@@ -116,11 +117,14 @@ class TestDataCreator:
         dir2_paths.add(dir2a_path)
         mkdir(dir2a_path)
 
-        csv2_path: str = join(dir2a_path, CSV2_NAME + CSV_EXTENSION)
-        dir2_paths.add(csv2_path)
-        # TODO: Fill in data frame
-        csv2: DataFrame = DataFrame({})
-        csv2.to_csv(csv2_path)
+        csv2_dict: dict = {
+            CSV2_NUMERIC_FEAT1_NAME: [
+                float(CSV2_NUMERIC_FEAT1_VAL1), -float(CSV2_NUMERIC_FEAT1_VAL1), float(CSV2_NUMERIC_FEAT1_VAL2)],
+            CSV2_NUMERIC_FEAT2_NAME: [
+                int(CSV2_NUMERIC_FEAT2_VAL1), float(CSV2_NUMERIC_FEAT2_VAL2), -int(CSV2_NUMERIC_FEAT2_VAL1)
+            ]
+        }
+        TestDataCreator._make_csv(csv_dict=csv2_dict, csv_dir=dir2a_path, csv_name=CSV2_NAME, paths=dir2_paths)
 
         dir2a1_path: str = join(dir2a_path, DIR2A1_NAME)
         dir2_paths.add(dir2a1_path)
@@ -160,11 +164,15 @@ class TestDataCreator:
         dir3_paths.add(dir3a_path)
         mkdir(dir3a_path)
 
-        csv3_path: str = join(dir3a_path, CSV3_NAME + CSV_EXTENSION)
-        dir3_paths.add(csv3_path)
-        # TODO: Fill in data frame
-        csv3: DataFrame = DataFrame({})
-        csv3.to_csv(csv3_path)
+        csv3_dict: dict = {
+            CSV3_NOMINAL_FEAT_NAME: [CSV3_NOMINAL_FEAT_VAL1, CSV3_NOMINAL_FEAT_VAL2, CSV3_NOMINAL_FEAT_VAL3],
+            CSV3_NUMERIC_FEAT_NAME: [
+                float(CSV3_NUMERIC_FEAT_VAL1), float(CSV3_NUMERIC_FEAT_VAL2), float(CSV3_NUMERIC_FEAT_VAL3)
+            ]
+        }
+        csv3_path: str = TestDataCreator._make_csv(
+            csv_dict=csv3_dict, csv_dir=dir3a_path, csv_name=CSV3_NAME, paths=dir3_paths
+        )
 
         if compress:
             TestDataCreator._compress_gz(csv3_path)
@@ -172,6 +180,24 @@ class TestDataCreator:
             TestDataCreator._compress_tar(dir_path=dir3_path, dest_dir=TEST_DATA_PATH)
 
         return dir3_paths
+
+    @staticmethod
+    def _make_csv(csv_dict: dict, csv_dir: str, csv_name: str, paths: set) -> str:
+        """
+        Creates a data frame, saves it as a csv, and adds the csv file path to a set
+
+        @param csv_dict: The data for the csv
+        @param csv_dir: The directory to save the csv in
+        @param csv_name: The name of the csv file to create
+        @param paths: The set of paths to add the csv path to
+        @return: The csv file path if desired
+        """
+
+        csv: DataFrame = DataFrame(csv_dict)
+        csv_path: str = join(csv_dir, csv_name + CSV_EXTENSION)
+        csv.to_csv(csv_path, index=False)
+        paths.add(csv_path)
+        return csv_path
 
     @staticmethod
     def _compress_gz(file_path: str):
