@@ -33,13 +33,13 @@ class ExtractHandler(Handler):
         @param file_path: The path to the file to extract
         """
 
-        if GZ_EXTENSION in file_path and TAR_EXTENSION in file_path:
+        if file_path.endswith(TAR_EXTENSION + GZ_EXTENSION):
             ExtractHandler._extract_tar_gz(file_path=file_path, dest_dir=root)
-        elif GZ_EXTENSION in file_path:
+        elif file_path.endswith(GZ_EXTENSION):
             ExtractHandler._extract_gz(file_path=file_path)
-        elif TAR_EXTENSION in file_path:
+        elif file_path.endswith(TAR_EXTENSION):
             ExtractHandler._extract_tar(file_path=file_path, dest_dir=root)
-        elif ZIP_EXTENSION in file_path:
+        elif file_path.endswith(ZIP_EXTENSION):
             ExtractHandler._extract_zip(file_path=file_path, dest_dir=root)
 
     @staticmethod
