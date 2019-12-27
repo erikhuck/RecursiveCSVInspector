@@ -1,4 +1,4 @@
-"""Module containing the csv object class and the csv column class that it depends on"""
+"""Module containing the csv object class and the csv column classes that it depends on"""
 
 from collections import Counter, Iterable
 from numpy import issubdtype, ndarray, number
