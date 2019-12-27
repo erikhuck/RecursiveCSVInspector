@@ -136,6 +136,12 @@ class InspectHandler(Handler):
 
     @staticmethod
     def _get_info() -> list:
+        """
+        Creates and returns the information for all the relevant csv files
+
+        @return: The list of output lines
+        """
+
         # If there are no relevant CSVs, return the no output message
         if len(InspectHandler._csv_objects) == 0:
             return [NO_OUTPUT_MSG]
