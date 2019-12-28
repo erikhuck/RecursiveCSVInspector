@@ -7,18 +7,8 @@ from pandas import DataFrame
 from handler.master_handler import MasterHandler
 from strings.extract_handler import TAR_EXTENSION
 from strings.args import DATA_PATH_ARG, KEY_WORDS_ARG
-from strings.general import CSV_EXTENSION
-from strings.test_data import (
-    CSV1_NAME, CSV1_NOMINAL_FEAT1_NAME, CSV1_NOMINAL_FEAT1_VAL1, CSV1_NOMINAL_FEAT1_VAL2, CSV1_NOMINAL_FEAT1_VAL3,
-    CSV1_NOMINAL_FEAT2_NAME, CSV1_NOMINAL_FEAT2_VAL, CSV1_NUMERIC_FEAT_NAME, CSV1_NUMERIC_FEAT_VAL1,
-    CSV1_NUMERIC_FEAT_VAL2, CSV1_NUMERIC_FEAT_VAL3, CSV1_NUMERIC_FEAT_VAL4, CSV2_NAME, CSV2_NUMERIC_FEAT1_NAME,
-    CSV2_NUMERIC_FEAT1_VAL1, CSV2_NUMERIC_FEAT1_VAL2, CSV2_NUMERIC_FEAT2_NAME, CSV2_NUMERIC_FEAT2_VAL1,
-    CSV2_NUMERIC_FEAT2_VAL2, CSV3_NAME, CSV3_NOMINAL_FEAT_NAME, CSV3_NOMINAL_FEAT_VAL1, CSV3_NOMINAL_FEAT_VAL2,
-    CSV3_NOMINAL_FEAT_VAL3, CSV3_NUMERIC_FEAT_NAME, CSV3_NUMERIC_FEAT_VAL1, CSV3_NUMERIC_FEAT_VAL2,
-    CSV3_NUMERIC_FEAT_VAL3, DIR1_NAME, DIR2_NAME, DIR2A_NAME, DIR2A1_NAME, DIR3_NAME, DIR3A_NAME, EMPTY_DIR_NAME,
-    GZ_COMPRESS_COMMAND, REMOVE_DIR_COMMAND, TAR_COMPRESS_COMMAND, TEST_DATA_PATH, TXT_EXTENSION, TXT1_NAME, TXT2_NAME,
-    ZIP_COMPRESS_COMMAND
-)
+from strings.general import CSV_EXTENSION, NAN
+from strings.test_data import *
 
 
 class TestDataCreator:
@@ -60,8 +50,8 @@ class TestDataCreator:
                 CSV1_NOMINAL_FEAT2_VAL, CSV1_NOMINAL_FEAT2_VAL
             ],
             CSV1_NUMERIC_FEAT_NAME: [
-                CSV1_NUMERIC_FEAT_VAL1, CSV1_NUMERIC_FEAT_VAL3, CSV1_NUMERIC_FEAT_VAL3, CSV1_NUMERIC_FEAT_VAL4,
-                CSV1_NUMERIC_FEAT_VAL3, CSV1_NUMERIC_FEAT_VAL2
+                int(CSV1_NUMERIC_FEAT_VAL1), int(CSV1_NUMERIC_FEAT_VAL3), int(CSV1_NUMERIC_FEAT_VAL3),
+                int(CSV1_NUMERIC_FEAT_VAL4), int(CSV1_NUMERIC_FEAT_VAL3), int(CSV1_NUMERIC_FEAT_VAL2)
             ]
         }
         TestDataCreator._make_csv(
@@ -122,7 +112,8 @@ class TestDataCreator:
                 float(CSV2_NUMERIC_FEAT1_VAL1), -float(CSV2_NUMERIC_FEAT1_VAL1), float(CSV2_NUMERIC_FEAT1_VAL2)],
             CSV2_NUMERIC_FEAT2_NAME: [
                 int(CSV2_NUMERIC_FEAT2_VAL1), float(CSV2_NUMERIC_FEAT2_VAL2), -int(CSV2_NUMERIC_FEAT2_VAL1)
-            ]
+            ],
+            CSV2_FEAT3_NAME: [float(NAN), float(NAN), float(NAN)]
         }
         TestDataCreator._make_csv(csv_dict=csv2_dict, csv_dir=dir2a_path, csv_name=CSV2_NAME, paths=dir2_paths)
 
@@ -165,10 +156,10 @@ class TestDataCreator:
         mkdir(dir3a_path)
 
         csv3_dict: dict = {
-            CSV3_NOMINAL_FEAT_NAME: [CSV3_NOMINAL_FEAT_VAL1, CSV3_NOMINAL_FEAT_VAL2, CSV3_NOMINAL_FEAT_VAL3],
-            CSV3_NUMERIC_FEAT_NAME: [
-                float(CSV3_NUMERIC_FEAT_VAL1), float(CSV3_NUMERIC_FEAT_VAL2), float(CSV3_NUMERIC_FEAT_VAL3)
-            ]
+            CSV3_NOMINAL_FEAT1_NAME: [CSV3_NOMINAL_FEAT1_VAL1, CSV3_NOMINAL_FEAT1_VAL2, CSV3_NOMINAL_FEAT1_VAL3],
+            CSV3_NOMINAL_FEAT2_NAME: [CSV3_NOMINAL_FEAT2_VAL, float(NAN), CSV3_NOMINAL_FEAT2_VAL],
+            CSV3_NUMERIC_FEAT1_NAME: [float(CSV3_NUMERIC_FEAT1_VAL1), float(NAN), float(CSV3_NUMERIC_FEAT1_VAL2)],
+            CSV3_NUMERIC_FEAT2_NAME: [int(CSV3_NUMERIC_FEAT2_VAL1), float(NAN), int(CSV3_NUMERIC_FEAT2_VAL2)]
         }
         csv3_path: str = TestDataCreator._make_csv(
             csv_dict=csv3_dict, csv_dir=dir3a_path, csv_name=CSV3_NAME, paths=dir3_paths
