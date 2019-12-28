@@ -1,10 +1,10 @@
 """Module containing the csv object class and the csv column classes that it depends on"""
 
 from collections import Counter, Iterable
-from numpy import issubdtype, ndarray, number
+from numpy import isnan, issubdtype, ndarray, number
 from pandas import DataFrame, read_csv, Series
 
-from strings.general import CSV_EXTENSION
+from strings.general import CSV_EXTENSION, NAN
 from strings.inspect_handler import INDENT, MAPPING_SYMBOL, MAX_KEY, MEAN_KEY, MIN_KEY, RANGE_KEY, STD_KEY
 
 
@@ -110,6 +110,9 @@ class NominalColumn(CSVColumn):
 
         # Get the frequency of each class in the nominal column
         for clazz in col:
+            if type(clazz) is float:
+                assert isnan(clazz)
+                clazz: str = NAN
             self._class_counts[clazz] += 1
 
     def get_classes(self) -> Iterable:

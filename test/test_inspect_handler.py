@@ -4,15 +4,9 @@ from unittest import TestCase
 
 from handler.inspect_handler.inspect_handler import InspectHandler
 from handler.master_handler import MasterHandler
-from strings.args import INSPECT_HANDLER_NAME, TEST_KEY_WORD1, TEST_KEY_WORD2
+from strings.args import INSPECT_HANDLER_NAME, TEST_KEY_WORD1, TEST_KEY_WORD2, TEST_KEY_WORD3, TEST_KEY_WORD4
 from strings.inspect_handler import NO_OUTPUT_MSG
-from strings.test_inspect_handler import (
-    CSV1_LINE1, CSV1_LINE2, CSV1_LINE3, CSV1_LINE4, CSV1_LINE5, CSV1_LINE6, CSV1_LINE7, CSV1_LINE8, CSV1_LINE9,
-    CSV1_LINE10, CSV1_LINE11, CSV1_LINE12, CSV1_LINE13, CSV2_LINE1, CSV2_LINE2, CSV2_LINE3, CSV2_LINE4, CSV2_LINE5,
-    CSV2_LINE6, CSV2_LINE7, CSV2_LINE8, CSV2_LINE9, CSV2_LINE10, CSV2_LINE11, CSV3_LINE1, CSV3_LINE2, CSV3_LINE3,
-    CSV3_LINE4, CSV3_LINE5, CSV3_LINE6, CSV3_LINE7, CSV3_LINE8, CSV3_LINE9, CSV3_LINE10, CSV3_LINE11, CSV3_LINE12,
-    CSV3_LINE13
-)
+from strings.test_inspect_handler import *
 from test.utils import get_inspect_args, get_master_handler, TestDataCreator
 
 
@@ -27,10 +21,16 @@ class TestInspectHandler(TestCase):
         creator.create_test_data(compress=False)
 
         key_words: list = [TEST_KEY_WORD1, TEST_KEY_WORD2]
-        expected_output: list = TestInspectHandler._get_expected_output(csv1=True, csv2=True, csv3=True)
+        expected_output: list = TestInspectHandler._get_expected_output(csv1=False, csv2=True, csv3=True)
         self._run_handler(key_words=key_words, expected_output=expected_output)
 
-        # TODO: Create more test cases
+        key_words: list = [TEST_KEY_WORD3]
+        expected_output: list = TestInspectHandler._get_expected_output(csv1=True, csv2=False, csv3=True)
+        self._run_handler(key_words=key_words, expected_output=expected_output)
+
+        key_words: list = [TEST_KEY_WORD4]
+        expected_output: list = TestInspectHandler._get_expected_output(csv1=False, csv2=False, csv3=False)
+        self._run_handler(key_words=key_words, expected_output=expected_output)
 
         creator.destroy_test_data()
 
@@ -104,7 +104,8 @@ class TestInspectHandler(TestCase):
 
         return [
             CSV2_LINE1, CSV2_LINE2, CSV2_LINE3, CSV2_LINE4, CSV2_LINE5, CSV2_LINE6, CSV2_LINE7, CSV2_LINE8, CSV2_LINE9,
-            CSV2_LINE10, CSV2_LINE11
+            CSV2_LINE10, CSV2_LINE11, CSV2_LINE12, CSV2_LINE13, CSV2_LINE14, CSV2_LINE15, CSV2_LINE16, CSV2_LINE17,
+            CSV2_LINE18, CSV2_LINE19
         ]
 
     @staticmethod
@@ -117,5 +118,6 @@ class TestInspectHandler(TestCase):
 
         return [
             CSV3_LINE1, CSV3_LINE2, CSV3_LINE3, CSV3_LINE4, CSV3_LINE5, CSV3_LINE6, CSV3_LINE7, CSV3_LINE8, CSV3_LINE9,
-            CSV3_LINE10, CSV3_LINE11, CSV3_LINE12, CSV3_LINE13
+            CSV3_LINE10, CSV3_LINE11, CSV3_LINE12, CSV3_LINE13, CSV3_LINE14, CSV3_LINE15, CSV3_LINE16, CSV3_LINE17,
+            CSV3_LINE18, CSV3_LINE19, CSV3_LINE20
         ]

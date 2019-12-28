@@ -77,7 +77,7 @@ class InspectHandler(Handler):
             # If a key word wasn't in the file path, check the column names
             if not relevant:
                 col_names: Iterable = csv_obj.get_csv_col_names()
-                InspectHandler._check_matches(potential_matches=col_names)
+                relevant: bool = InspectHandler._check_matches(potential_matches=col_names)
 
             # If a key word wasn't in the column names, check the values of nominal columns
             if not relevant:
