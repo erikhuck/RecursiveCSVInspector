@@ -20,26 +20,42 @@ class TestInspectHandler(TestCase):
 
         creator.create_test_data(compress=False)
 
+        """
+        Test for non-cap-sensitivity in a file path, a match in a file path, using multiple key words, a column
+        consisting entirely of floats, a column consisting of both integers and floats, a column consisting of nominal
+        and numeric values, a column consisting of integers and NaNs, a column consisting of floats and NaNs, a column
+        consisting of nominal values and NaNs, a column with only NaNs, and test that a CSV's information is not shown
+        multiple times even if it gets a match in multiple ways
+        """
         key_words: list = [TEST_KEY_WORD1, TEST_KEY_WORD2]
         expected_output: list = TestInspectHandler._get_expected_output(csv1=False, csv2=True, csv3=True)
         self._run_handler(key_words=key_words, expected_output=expected_output)
 
+        """
+        Test for non-cap-sensitivity in column names and nominal values, matches in column names and nominal values,
+        using a single key word, a column entirely consisting of integers, a nominal column with differing value-counts,
+        and a nominal column with all the same value
+        """
         key_words: list = [TEST_KEY_WORD3]
         expected_output: list = TestInspectHandler._get_expected_output(csv1=True, csv2=False, csv3=True)
         self._run_handler(key_words=key_words, expected_output=expected_output)
 
+        # Test for getting no relevant CSVs
         key_words: list = [TEST_KEY_WORD4]
         expected_output: list = TestInspectHandler._get_expected_output(csv1=False, csv2=False, csv3=False)
-        self._run_handler(key_words=key_words, expected_output=expected_output)
+
+        # Test for a data path with a trailing slash
+        self._run_handler(key_words=key_words, expected_output=expected_output, trailing_slash=True)
 
         creator.destroy_test_data()
 
-    def _run_handler(self, key_words: list, expected_output: list):
+    def _run_handler(self, key_words: list, expected_output: list, trailing_slash: bool = False):
         """
         Runs the inspect handler and tests the output for a given list of key words
 
         @param key_words: The key words for the inspect handler
         @param expected_output: The output to check against
+        @param trailing_slash: Whether the test data directory path has a trailing slash at the end of it
         """
 
         # Reset the inspect handler
@@ -48,7 +64,9 @@ class TestInspectHandler(TestCase):
         InspectHandler._data_path = None
 
         argv: list = get_inspect_args(key_words=key_words)
-        master_handler: MasterHandler = get_master_handler(handler_type=INSPECT_HANDLER_NAME, extra_args=argv)
+        master_handler: MasterHandler = get_master_handler(
+            handler_type=INSPECT_HANDLER_NAME, extra_args=argv, trailing_slash=trailing_slash
+        )
         master_handler.handle()
 
         actual_output: list = InspectHandler._get_info()
