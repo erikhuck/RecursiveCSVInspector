@@ -2,12 +2,12 @@
 
 from argparse import ArgumentParser, Namespace
 from collections import Iterable
-from os.path import join, split
 
 from handler.handler import Handler
 from handler.inspect_handler.csv_object import CSVObject, NominalColumn
+from handler.utils import remove_root_dir
 from strings.args import KEY_WORDS_ARG, KEY_WORDS_ARG_HELP, STORE_ACTION
-from strings.general import CSV_EXTENSION, EMPTY_STRING
+from strings.general import CSV_EXTENSION
 from strings.inspect_handler import NO_OUTPUT_MSG
 
 
@@ -67,7 +67,8 @@ class InspectHandler(Handler):
         if file_path.endswith(CSV_EXTENSION):
             csv_obj: CSVObject = CSVObject(csv_path=file_path)
 
-            file_path: str = InspectHandler._remove_root_dir(file_path=file_path)
+            # Remove the root directory from the file path before looking for matches, it being arbitrary and irrelevant
+            file_path: str = remove_root_dir(file_path=file_path, root=InspectHandler._data_path)
 
             assert file_path not in InspectHandler._csv_objects
 
@@ -93,25 +94,6 @@ class InspectHandler(Handler):
 
             if relevant:
                 InspectHandler._csv_objects[file_path] = csv_obj
-
-    @staticmethod
-    def _remove_root_dir(file_path: str) -> str:
-        """
-        Removes the root directory from a file path, it being arbitrary and irrelevant
-
-        @param file_path: The file path to remove the root directory from
-        @return: The modified file path
-        """
-
-        remaining_path, end_of_path = split(file_path)
-        path_components: list = [end_of_path]
-        while remaining_path != InspectHandler._data_path:
-            assert remaining_path != EMPTY_STRING
-
-            remaining_path, end_of_path = split(remaining_path)
-            path_components.insert(0, end_of_path)
-        file_path: str = join(*path_components)
-        return file_path
 
     @staticmethod
     def _check_matches(potential_matches: Iterable) -> bool:

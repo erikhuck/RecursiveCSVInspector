@@ -5,6 +5,7 @@ from os.path import isdir, isfile, join, realpath, split
 from pandas import DataFrame
 
 from handler.master_handler import MasterHandler
+from handler.utils import add_trailing_slash
 from strings.extract_handler import TAR_EXTENSION
 from strings.args import DATA_PATH_ARG, KEY_WORDS_ARG
 from strings.general import CSV_EXTENSION, NAN
@@ -302,18 +303,24 @@ class NewWorkingDir:
         chdir(self._old_working_dir)
 
 
-def get_master_handler(handler_type: str, extra_args: list = None) -> MasterHandler:
+def get_master_handler(handler_type: str, extra_args: list = None, trailing_slash: bool = False) -> MasterHandler:
     """
     Creates a master handler with the given handler type, for the purpose of testing
 
     @param handler_type: The type of handler for the master handler to run
     @param extra_args: The remaining arguments to add on to the base arguments
+    @param trailing_slash: Whether to add a trailing slash to the test data directory path
     @return: The master handler
     """
 
+    test_data_path: str = TEST_DATA_PATH
+
+    if trailing_slash:
+        test_data_path: str = add_trailing_slash(dir_path=test_data_path)
+
     argv: list = [
         handler_type,
-        DATA_PATH_ARG, TEST_DATA_PATH
+        DATA_PATH_ARG, test_data_path
     ]
 
     if extra_args is not None:
