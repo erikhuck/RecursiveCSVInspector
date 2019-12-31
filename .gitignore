@@ -2,3 +2,4 @@ ADNI_data*
 .idea
 *__pycache__*
 env
+ADNI_basic_data
