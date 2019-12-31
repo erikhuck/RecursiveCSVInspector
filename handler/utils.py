@@ -32,7 +32,7 @@ def remove_root_dir(file_path: str, root: str) -> str:
     remaining_path, end_of_path = split(file_path)
     path_components: list = [end_of_path]
 
-    # While the remaining path is not the root directory or the root directory with a trailing slash
+    # While the remaining path is not the root directory nor the root directory with a trailing slash
     while remaining_path != root and root != add_trailing_slash(dir_path=remaining_path):
         assert remaining_path != EMPTY_STRING
 
