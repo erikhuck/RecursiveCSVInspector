@@ -1,14 +1,14 @@
 """Module containing functionality used for a number of different tests"""
 
 from os import chdir, getcwd, mkdir, system
-from os.path import isdir, isfile, join, realpath, split
+from os.path import isdir, isfile, join, realpath
 from pandas import DataFrame
 
 from handler.master_handler import MasterHandler
 from handler.utils import add_trailing_slash
-from strings.extract_handler import TAR_EXTENSION
+from strings.extract_handler import GZ_EXTENSION, TAR_EXTENSION, TAR_GZ_EXTENSION, ZIP_EXTENSION
 from strings.args import DATA_PATH_ARG, KEY_WORDS_ARG
-from strings.general import CSV_EXTENSION, NAN
+from strings.general import CSV_EXTENSION, EMPTY_STRING, NAN
 from strings.test_data import *
 
 
@@ -55,9 +55,10 @@ class TestDataCreator:
                 int(CSV1_NUMERIC_FEAT_VAL4), int(CSV1_NUMERIC_FEAT_VAL3), int(CSV1_NUMERIC_FEAT_VAL2)
             ]
         }
-        TestDataCreator._make_csv(
-            csv_dict=csv1_dict, csv_dir=TEST_DATA_PATH, csv_name=CSV1_NAME, paths=self._test_data_paths
+        _, csv1_path = TestDataCreator._make_csv_path(
+            csv_name=CSV1_NAME, csv_dir=TEST_DATA_PATH, paths=self._test_data_paths
         )
+        TestDataCreator._make_csv(csv_dict=csv1_dict, csv_path=csv1_path)
 
         dir1_paths: set = TestDataCreator._make_dir1(compress=compress)
         self._test_data_paths.update(dir1_paths)
@@ -79,13 +80,17 @@ class TestDataCreator:
 
         dir1_path: str = join(TEST_DATA_PATH, DIR1_NAME)
         dir1_paths.add(dir1_path)
-        mkdir(dir1_path)
+
         empty_dir_path: str = join(dir1_path, EMPTY_DIR_NAME)
         dir1_paths.add(empty_dir_path)
-        mkdir(empty_dir_path)
 
         if compress:
-            TestDataCreator._compress_tar_gz(dir_path=dir1_path, dest_dir=TEST_DATA_PATH)
+            empty_dir_path: str = join(TEST_DATA_PATH, EMPTY_DIR_NAME)
+            mkdir(empty_dir_path)
+            TestDataCreator._compress_tar_gz(dir_name=DIR1_NAME, dest_dir=TEST_DATA_PATH, components=[EMPTY_DIR_NAME])
+        else:
+            mkdir(dir1_path)
+            mkdir(empty_dir_path)
 
         return dir1_paths
 
@@ -102,11 +107,9 @@ class TestDataCreator:
 
         dir2_path: str = join(TEST_DATA_PATH, DIR2_NAME)
         dir2_paths.add(dir2_path)
-        mkdir(dir2_path)
 
         dir2a_path: str = join(dir2_path, DIR2A_NAME)
         dir2_paths.add(dir2a_path)
-        mkdir(dir2a_path)
 
         csv2_dict: dict = {
             CSV2_NUMERIC_FEAT1_NAME: [
@@ -116,20 +119,41 @@ class TestDataCreator:
             ],
             CSV2_FEAT3_NAME: [float(NAN), float(NAN), float(NAN)]
         }
-        TestDataCreator._make_csv(csv_dict=csv2_dict, csv_dir=dir2a_path, csv_name=CSV2_NAME, paths=dir2_paths)
+        csv2_name, csv2_path = TestDataCreator._make_csv_path(csv_name=CSV2_NAME, csv_dir=dir2a_path, paths=dir2_paths)
 
         dir2a1_path: str = join(dir2a_path, DIR2A1_NAME)
         dir2_paths.add(dir2a1_path)
-        mkdir(dir2a1_path)
 
-        txt1_path: str = join(dir2a1_path, TXT1_NAME + TXT_EXTENSION)
+        txt1_name: str = TXT1_NAME + TXT_EXTENSION
+        txt1_path: str = join(dir2a1_path, txt1_name)
         dir2_paths.add(txt1_path)
-        open(txt1_path, 'w')
 
         if compress:
+            dir2a1_path: str = join(TEST_DATA_PATH, DIR2A1_NAME)
+
+            # TODO: Change this mkdir into a compress tgz for an extract .tgz test
+            mkdir(dir2a1_path)
+
+            txt1_path: str = join(dir2a1_path, txt1_name)
+            open(txt1_path, 'w')
             TestDataCreator._compress_gz(txt1_path)
-            TestDataCreator._compress_tar_gz(dir_path=dir2a_path, dest_dir=dir2_path)
-            TestDataCreator._compress_zip(dir_path=dir2_path, dest_dir=TEST_DATA_PATH)
+
+            csv2_path: str = join(TEST_DATA_PATH, csv2_name)
+            TestDataCreator._make_csv(csv_dict=csv2_dict, csv_path=csv2_path)
+
+            TestDataCreator._compress_tar_gz(
+                dir_name=DIR2A_NAME, dest_dir=TEST_DATA_PATH, components=[DIR2A1_NAME, csv2_name]
+            )
+
+            TestDataCreator._compress_zip(
+                dir_name=DIR2_NAME, dest_dir=TEST_DATA_PATH, components=[DIR2A_NAME + TAR_GZ_EXTENSION]
+            )
+        else:
+            mkdir(dir2_path)
+            mkdir(dir2a_path)
+            TestDataCreator._make_csv(csv_dict=csv2_dict, csv_path=csv2_path)
+            mkdir(dir2a1_path)
+            open(txt1_path, 'w')
 
         return dir2_paths
 
@@ -146,15 +170,13 @@ class TestDataCreator:
 
         dir3_path: str = join(TEST_DATA_PATH, DIR3_NAME)
         dir3_paths.add(dir3_path)
-        mkdir(dir3_path)
 
-        txt2_path: str = join(dir3_path, TXT2_NAME + TXT_EXTENSION)
+        txt2_name: str = TXT2_NAME + TXT_EXTENSION
+        txt2_path: str = join(dir3_path, txt2_name)
         dir3_paths.add(txt2_path)
-        open(txt2_path, 'w')
 
         dir3a_path: str = join(dir3_path, DIR3A_NAME)
         dir3_paths.add(dir3a_path)
-        mkdir(dir3a_path)
 
         csv3_dict: dict = {
             CSV3_NOMINAL_FEAT1_NAME: [CSV3_NOMINAL_FEAT1_VAL1, CSV3_NOMINAL_FEAT1_VAL2, CSV3_NOMINAL_FEAT1_VAL3],
@@ -162,34 +184,58 @@ class TestDataCreator:
             CSV3_NUMERIC_FEAT1_NAME: [float(CSV3_NUMERIC_FEAT1_VAL1), float(NAN), float(CSV3_NUMERIC_FEAT1_VAL2)],
             CSV3_NUMERIC_FEAT2_NAME: [int(CSV3_NUMERIC_FEAT2_VAL1), float(NAN), int(CSV3_NUMERIC_FEAT2_VAL2)]
         }
-        csv3_path: str = TestDataCreator._make_csv(
-            csv_dict=csv3_dict, csv_dir=dir3a_path, csv_name=CSV3_NAME, paths=dir3_paths
-        )
+        csv3_name, csv3_path = TestDataCreator._make_csv_path(csv_name=CSV3_NAME, csv_dir=dir3a_path, paths=dir3_paths)
 
         if compress:
+            csv3_path: str = join(TEST_DATA_PATH, csv3_name)
+            TestDataCreator._make_csv(csv_dict=csv3_dict, csv_path=csv3_path)
             TestDataCreator._compress_gz(csv3_path)
-            TestDataCreator._compress_zip(dir_path=dir3a_path, dest_dir=dir3_path)
-            TestDataCreator._compress_tar(dir_path=dir3_path, dest_dir=TEST_DATA_PATH)
+
+            TestDataCreator._compress_zip(
+                dir_name=DIR3A_NAME, dest_dir=TEST_DATA_PATH, components=[csv3_name + GZ_EXTENSION]
+            )
+
+            txt2_path: str = join(TEST_DATA_PATH, txt2_name)
+            open(txt2_path, 'w')
+
+            TestDataCreator._compress_tar(
+                dir_name=DIR3_NAME, dest_dir=TEST_DATA_PATH, components=[txt2_name, DIR3A_NAME + ZIP_EXTENSION]
+            )
+        else:
+            mkdir(dir3_path)
+            open(txt2_path, 'w')
+            mkdir(dir3a_path)
+            TestDataCreator._make_csv(csv_dict=csv3_dict, csv_path=csv3_path)
 
         return dir3_paths
 
     @staticmethod
-    def _make_csv(csv_dict: dict, csv_dir: str, csv_name: str, paths: set) -> str:
+    def _make_csv_path(csv_name: str, csv_dir: str, paths: set):
         """
-        Creates a data frame, saves it as a csv, and adds the csv file path to a set
+        Creates a path to a csv file, adds it to a set, and returns its name and path to be used for other purposes
+
+        @param csv_name: The name of the csv to create a path for, not including the csv extension
+        @param csv_dir: The directory where the csv file will be located
+        @param paths: The set to add the csv path to
+        @return: The csv name with the proper file extension attached and the path that was created
+        """
+
+        csv_name: str = csv_name + CSV_EXTENSION
+        csv_path: str = join(csv_dir, csv_name)
+        paths.add(csv_path)
+        return csv_name, csv_path
+
+    @staticmethod
+    def _make_csv(csv_dict: dict, csv_path: str):
+        """
+        Creates a data frame and saves it as a csv
 
         @param csv_dict: The data for the csv
-        @param csv_dir: The directory to save the csv in
-        @param csv_name: The name of the csv file to create
-        @param paths: The set of paths to add the csv path to
-        @return: The csv file path if desired
+        @param csv_path: The path of the csv to save
         """
 
         csv: DataFrame = DataFrame(csv_dict)
-        csv_path: str = join(csv_dir, csv_name + CSV_EXTENSION)
         csv.to_csv(csv_path, index=False)
-        paths.add(csv_path)
-        return csv_path
 
     @staticmethod
     def _compress_gz(file_path: str):
@@ -205,81 +251,85 @@ class TestDataCreator:
         system(command)
 
     @staticmethod
-    def _compress_zip(dir_path: str, dest_dir: str):
+    def _compress_zip(dir_name: str, dest_dir: str, components: list):
         """
-        Compresses a directory as a .zip file
+        Compresses a collection of files or directories into a .zip file
 
-        @param dir_path: The path to the directory to compress
+        @param dir_name: The name of the directory to create and compress
         @param dest_dir: The path to the directory to place the resulting .zip file
+        @param components: The collection of files or directories
         """
 
         TestDataCreator._compress_dir(
-            dir_path=dir_path, dest_dir=dest_dir, compress_command=ZIP_COMPRESS_COMMAND
+            dir_name=dir_name, dest_dir=dest_dir, components=components, compress_command=ZIP_COMPRESS_COMMAND
         )
 
     @staticmethod
-    def _compress_tar(dir_path: str, dest_dir: str):
+    def _compress_tar(dir_name: str, dest_dir: str, components: list):
         """
-        Compresses a directory as a .tar file
-        @param dir_path: The path to the directory to compress
+        Compresses a collection of files or directories into a .tar file
+
+        @param dir_name: The name of the directory to create and compress
         @param dest_dir: The path to the directory to place the resulting .tar file
+        @param components: The collection of files or directories
         """
 
         TestDataCreator._compress_dir(
-            dir_path=dir_path, dest_dir=dest_dir, compress_command=TAR_COMPRESS_COMMAND
+            dir_name=dir_name, dest_dir=dest_dir, components=components, compress_command=TAR_COMPRESS_COMMAND
         )
 
     @staticmethod
-    def _compress_tar_gz(dir_path: str, dest_dir: str):
+    def _compress_tar_gz(dir_name: str, dest_dir: str, components: list):
         """
-        Compresses a directory with as a .tar.gz file
+        Compresses a collection of files or directories into a .tar.gz file
 
-        @param dir_path: The path to the directory to compress
+        @param dir_name: The name of the directory to create and compress
         @param dest_dir: Path to the directory to place the resulting .tar.gz file
+        @param components: The collection of files or directories
         """
 
-        TestDataCreator._compress_tar(dir_path=dir_path, dest_dir=dest_dir)
-        tar_file_path: str = dir_path + TAR_EXTENSION
+        TestDataCreator._compress_tar(dir_name=dir_name, dest_dir=dest_dir, components=components)
+        tar_file_path: str = join(dest_dir, dir_name + TAR_EXTENSION)
         TestDataCreator._compress_gz(file_path=tar_file_path)
 
     @staticmethod
-    def _compress_dir(dir_path: str, dest_dir: str, compress_command: str):
+    def _compress_dir(dir_name: str, dest_dir: str, components: list, compress_command: str):
         """
-        Compresses a directory
+        Compresses a collection of files or directories into a compressed-directory file
 
-        @param dir_path: The path to the directory to compress
+        @param dir_name: The name of the directory to create and compress
         @param dest_dir: Path to the directory to place the resulting compressed-directory file
+        @param components: The collection of files or directories that will go into the compressed directory
         @param compress_command: The terminal-command which specifies the extension of the compressed-directory file
         """
 
-        assert isdir(dir_path)
         assert isdir(dest_dir)
 
-        dir_name: str = split(dir_path)[-1]
-        command: str = compress_command.format(dir_name)
+        components_str: str = EMPTY_STRING
+        for component in components:
+            components_str += component + SPACE
+
+        command: str = compress_command.format(dir_name, components_str)
 
         with NewWorkingDir(new_working_dir=dest_dir):
             system(command)
-
-        TestDataCreator._remove_dir(dir_path=dir_path)
+            TestDataCreator._remove(paths=components_str)
 
     @staticmethod
-    def _remove_dir(dir_path: str):
+    def _remove(paths: str):
         """
-        Removes the directory in the given path, ensuring that the path leads to a directory that exists
+        Removes a collection of directories or files from the file system
 
-        @param dir_path: The path of the directory to remove
+        @param paths: The collection of directories or files in a space separated string
         """
 
-        assert isdir(dir_path)
-
-        command: str = REMOVE_DIR_COMMAND.format(dir_path)
+        command: str = REMOVE_COMMAND.format(paths)
         system(command)
 
     def destroy_test_data(self):
         """Removes all the files and folders that are part of the data created for testing"""
 
-        TestDataCreator._remove_dir(dir_path=TEST_DATA_PATH)
+        TestDataCreator._remove(paths=TEST_DATA_PATH)
         self._test_data_paths: set = set()
 
 

@@ -1,14 +1,11 @@
 """Module for the extract handler class"""
 
 from argparse import Namespace
-from os import system
-from os.path import isdir, isfile
+from os import mkdir, system
+from os.path import isdir, isfile, join, split
 
 from handler.handler import Handler
-from strings.extract_handler import (
-    GZ_EXTRACT_COMMAND, GZ_EXTENSION, TAR_EXTRACT_COMMAND, TAR_EXTENSION, TAR_GZ_EXTRACT_COMMAND, REMOVE_FILE_COMMAND,
-    ZIP_EXTRACT_COMMAND, ZIP_EXTENSION
-)
+from strings.extract_handler import *
 
 
 class ExtractHandler(Handler):
@@ -33,7 +30,7 @@ class ExtractHandler(Handler):
         @param file_path: The path to the file to extract
         """
 
-        if file_path.endswith(TAR_EXTENSION + GZ_EXTENSION):
+        if file_path.endswith(TAR_GZ_EXTENSION):
             ExtractHandler._extract_tar_gz(file_path=file_path, dest_dir=root)
         elif file_path.endswith(GZ_EXTENSION):
             ExtractHandler._extract_gz(file_path=file_path)
@@ -101,9 +98,45 @@ class ExtractHandler(Handler):
         assert isfile(file_path)
         assert isdir(dest_dir)
 
+        # Get the name of the compressed-directory file to act as the destination of the extracted contents
+        file_name: str = ExtractHandler._get_compressed_file_name(file_path=file_path)
+        dest_dir: str = join(dest_dir, file_name)
+
+        assert not isdir(dest_dir)
+        mkdir(dest_dir)
+
         command: str = extract_command.format(file_path, dest_dir)
         system(command)
+
         ExtractHandler._remove_file(file_path)
+
+    @staticmethod
+    def _get_compressed_file_name(file_path: str) -> str:
+        """
+        Gets the name of a compressed file
+
+        @param file_path: The path to the compressed file
+        @return: The name of the compressed file
+        """
+
+        assert isfile(file_path)
+
+        _, file_name = split(file_path)
+
+        if file_path.endswith(TAR_EXTENSION):
+            extension_len: int = len(TAR_EXTENSION)
+        elif file_path.endswith(ZIP_EXTENSION):
+            extension_len: int = len(ZIP_EXTENSION)
+        elif file_path.endswith(TAR_GZ_EXTENSION):
+            extension_len: int = len(TAR_GZ_EXTENSION)
+        else:
+            error_msg: str = FILE_EXTENSION_UNSUPPORTED_MSG.format(file_path)
+            raise ValueError(error_msg)
+
+        assert extension_len > 0
+
+        file_name: str = file_name[:len(file_name) - extension_len]
+        return file_name
 
     @staticmethod
     def _remove_file(file_path: str):
