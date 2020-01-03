@@ -135,7 +135,7 @@ class TestDataCreator:
             mkdir(dir2a1_path)
 
             txt1_path: str = join(dir2a1_path, txt1_name)
-            open(txt1_path, 'w')
+            TestDataCreator._make_txt(txt_path=txt1_path)
             TestDataCreator._compress_gz(txt1_path)
 
             csv2_path: str = join(TEST_DATA_PATH, csv2_name)
@@ -153,7 +153,7 @@ class TestDataCreator:
             mkdir(dir2a_path)
             TestDataCreator._make_csv(csv_dict=csv2_dict, csv_path=csv2_path)
             mkdir(dir2a1_path)
-            open(txt1_path, 'w')
+            TestDataCreator._make_txt(txt_path=txt1_path)
 
         return dir2_paths
 
@@ -196,14 +196,14 @@ class TestDataCreator:
             )
 
             txt2_path: str = join(TEST_DATA_PATH, txt2_name)
-            open(txt2_path, 'w')
+            TestDataCreator._make_txt(txt_path=txt2_path)
 
             TestDataCreator._compress_tar(
                 dir_name=DIR3_NAME, components=[txt2_name, DIR3A_NAME + ZIP_EXTENSION]
             )
         else:
             mkdir(dir3_path)
-            open(txt2_path, 'w')
+            TestDataCreator._make_txt(txt_path=txt2_path)
             mkdir(dir3a_path)
             TestDataCreator._make_csv(csv_dict=csv3_dict, csv_path=csv3_path)
 
@@ -224,6 +224,16 @@ class TestDataCreator:
         csv_path: str = join(csv_dir, csv_name)
         paths.add(csv_path)
         return csv_name, csv_path
+
+    @staticmethod
+    def _make_txt(txt_path: str):
+        """
+        Creates an empty txt file
+
+        @param txt_path: The path to the txt file to create
+        """
+
+        open(txt_path, WRITE_OPT)
 
     @staticmethod
     def _make_csv(csv_dict: dict, csv_path: str):
