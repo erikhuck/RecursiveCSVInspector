@@ -30,7 +30,7 @@ class ExtractHandler(Handler):
         @param file_path: The path to the file to extract
         """
 
-        if file_path.endswith(TAR_GZ_EXTENSION):
+        if file_path.endswith(TAR_GZ_EXTENSION) or file_path.endswith(TGZ_EXTENSION):
             ExtractHandler._extract_tar_gz(file_path=file_path, dest_dir=root)
         elif file_path.endswith(GZ_EXTENSION):
             ExtractHandler._extract_gz(file_path=file_path)
@@ -77,7 +77,7 @@ class ExtractHandler(Handler):
     @staticmethod
     def _extract_tar_gz(file_path, dest_dir: str):
         """
-        Extracts a file with a .tar.gz extension and removes it
+        Extracts a file with a .tar.gz extension and removes it. Also works with a .tgz extension.
 
         @param file_path: The path to the .tar.gz file to extract and remove
         @param dest_dir: The destination of the resulting extracted directory
@@ -129,6 +129,8 @@ class ExtractHandler(Handler):
             extension_len: int = len(ZIP_EXTENSION)
         elif file_path.endswith(TAR_GZ_EXTENSION):
             extension_len: int = len(TAR_GZ_EXTENSION)
+        elif file_path.endswith(TGZ_EXTENSION):
+            extension_len: int = len(TGZ_EXTENSION)
         else:
             error_msg: str = FILE_EXTENSION_UNSUPPORTED_MSG.format(file_path)
             raise ValueError(error_msg)

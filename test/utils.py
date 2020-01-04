@@ -6,7 +6,7 @@ from pandas import DataFrame
 
 from handler.master_handler import MasterHandler
 from handler.utils import add_trailing_slash
-from strings.extract_handler import GZ_EXTENSION, TAR_EXTENSION, TAR_GZ_EXTENSION, ZIP_EXTENSION
+from strings.extract_handler import GZ_EXTENSION, TAR_EXTENSION, TAR_GZ_EXTENSION, TGZ_EXTENSION, ZIP_EXTENSION
 from strings.args import DATA_PATH_ARG, KEY_WORDS_ARG
 from strings.general import CSV_EXTENSION, EMPTY_STRING, NAN
 from strings.test_data import *
@@ -129,20 +129,17 @@ class TestDataCreator:
         dir2_paths.add(txt1_path)
 
         if compress:
-            dir2a1_path: str = join(TEST_DATA_PATH, DIR2A1_NAME)
-
-            # TODO: Change this mkdir into a compress tgz for an extract .tgz test
-            mkdir(dir2a1_path)
-
-            txt1_path: str = join(dir2a1_path, txt1_name)
+            txt1_path: str = join(TEST_DATA_PATH, txt1_name)
             TestDataCreator._make_txt(txt_path=txt1_path)
             TestDataCreator._compress_gz(txt1_path)
+
+            TestDataCreator._compress_tgz(dir_name=DIR2A1_NAME, components=[txt1_name + GZ_EXTENSION])
 
             csv2_path: str = join(TEST_DATA_PATH, csv2_name)
             TestDataCreator._make_csv(csv_dict=csv2_dict, csv_path=csv2_path)
 
             TestDataCreator._compress_tar_gz(
-                dir_name=DIR2A_NAME, components=[DIR2A1_NAME, csv2_name]
+                dir_name=DIR2A_NAME, components=[DIR2A1_NAME + TGZ_EXTENSION, csv2_name]
             )
 
             TestDataCreator._compress_zip(
@@ -269,9 +266,7 @@ class TestDataCreator:
         @param components: The collection of files or directories
         """
 
-        TestDataCreator._compress_dir(
-            dir_name=dir_name, components=components, compress_command=ZIP_COMPRESS_COMMAND
-        )
+        TestDataCreator._compress_dir(dir_name=dir_name, components=components, compress_command=ZIP_COMPRESS_COMMAND)
 
     @staticmethod
     def _compress_tar(dir_name: str, components: list):
@@ -282,9 +277,18 @@ class TestDataCreator:
         @param components: The collection of files or directories
         """
 
-        TestDataCreator._compress_dir(
-            dir_name=dir_name, components=components, compress_command=TAR_COMPRESS_COMMAND
-        )
+        TestDataCreator._compress_dir(dir_name=dir_name, components=components, compress_command=TAR_COMPRESS_COMMAND)
+
+    @staticmethod
+    def _compress_tgz(dir_name: str, components: list):
+        """
+        Compresses a collection of files or directories into a .tgz file
+
+        @param dir_name: The name of the directory to create and compress
+        @param components: The collection of files or directories
+        """
+
+        TestDataCreator._compress_dir(dir_name=dir_name, components=components, compress_command=TGZ_COMPRESS_COMMAND)
 
     @staticmethod
     def _compress_tar_gz(dir_name: str, components: list):
