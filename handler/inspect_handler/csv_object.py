@@ -5,7 +5,9 @@ from numpy import isnan, issubdtype, ndarray, number
 from pandas import DataFrame, read_csv, Series
 
 from strings.general import CSV_EXTENSION, NAN
-from strings.inspect_handler import INDENT, MAPPING_SYMBOL, MAX_KEY, MEAN_KEY, MIN_KEY, RANGE_KEY, STD_KEY
+from strings.inspect_handler import (
+    INDENT, MAPPING_SYMBOL, MAX_KEY, MEAN_KEY, MIN_KEY, NUMERIC_TYPE_KEY, RANGE_KEY, STD_KEY
+)
 
 
 class CSVColumn:
@@ -110,10 +112,41 @@ class NominalColumn(CSVColumn):
 
         # Get the frequency of each class in the nominal column
         for clazz in col:
-            if type(clazz) is float:
+            if NominalColumn._is_numeric(obj=clazz):
+                clazz: str = NUMERIC_TYPE_KEY
+            elif type(clazz) is float:
                 assert isnan(clazz)
                 clazz: str = NAN
             self._class_counts[clazz] += 1
+
+    @staticmethod
+    def _is_numeric(obj) -> bool:
+        """
+        Determines if an object is numeric or can be casted to a numeric type
+
+        @param obj: The object to check
+        @return: Whether the object is numeric
+        """
+
+        if type(obj) is float:
+            obj: float = float(obj)
+            return not isnan(obj)
+
+        if type(obj) is int:
+            return True
+
+        assert type(obj) is str
+        obj: str = str(obj)
+
+        try:
+            int(obj)
+            return True
+        except ValueError:
+            try:
+                float(obj)
+                return True
+            except ValueError:
+                return False
 
     def get_classes(self) -> Iterable:
         """

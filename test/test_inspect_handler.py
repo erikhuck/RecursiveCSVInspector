@@ -34,7 +34,7 @@ class TestInspectHandler(TestCase):
         """
         Test for non-cap-sensitivity in column names and nominal values, matches in column names and nominal values,
         using a single key word, a column entirely consisting of integers, a nominal column with differing value-counts,
-        and a nominal column with all the same value
+        a nominal column with all the same value, and a nominal column with integers, floats, nominal values, and NaNs
         """
         key_words: list = [TEST_KEY_WORD3]
         expected_output: list = TestInspectHandler._get_expected_output(csv1=True, csv2=False, csv3=True)
@@ -109,7 +109,7 @@ class TestInspectHandler(TestCase):
 
         return [
             CSV1_LINE1, CSV1_LINE2, CSV1_LINE3, CSV1_LINE4, CSV1_LINE5, CSV1_LINE6, CSV1_LINE7, CSV1_LINE8, CSV1_LINE9,
-            CSV1_LINE10, CSV1_LINE11, CSV1_LINE12, CSV1_LINE13
+            CSV1_LINE10, CSV1_LINE11, CSV1_LINE12, CSV1_LINE13, CSV1_LINE14, CSV1_LINE15, CSV1_LINE16, CSV1_LINE17
         ]
 
     @staticmethod
@@ -137,5 +137,5 @@ class TestInspectHandler(TestCase):
         return [
             CSV3_LINE1, CSV3_LINE2, CSV3_LINE3, CSV3_LINE4, CSV3_LINE5, CSV3_LINE6, CSV3_LINE7, CSV3_LINE8, CSV3_LINE9,
             CSV3_LINE10, CSV3_LINE11, CSV3_LINE12, CSV3_LINE13, CSV3_LINE14, CSV3_LINE15, CSV3_LINE16, CSV3_LINE17,
-            CSV3_LINE18, CSV3_LINE19, CSV3_LINE20
+            CSV3_LINE18, CSV3_LINE19
         ]
