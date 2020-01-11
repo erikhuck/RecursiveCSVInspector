@@ -1,5 +1,6 @@
 """Module containing strings for the inspect handler"""
 
+CSV_NOT_LOADED_MSG: str = '\tThe CSV for this path could not be loaded due to an error of type: {} and with message: {}'
 INDENT: str = '\t'
 MAPPING_SYMBOL: str = ': '
 MAX_KEY: str = 'Max'

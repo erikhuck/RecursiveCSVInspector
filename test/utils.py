@@ -3,6 +3,7 @@
 from os import chdir, getcwd, mkdir, system
 from os.path import isdir, isfile, join, realpath
 from pandas import DataFrame
+from typing import Union
 
 from handler.master_handler import MasterHandler
 from handler.utils import add_trailing_slash
@@ -70,6 +71,13 @@ class TestDataCreator:
         self._test_data_paths.update(dir2_paths)
         dir3_paths: set = TestDataCreator._make_dir3(compress=compress)
         self._test_data_paths.update(dir3_paths)
+
+        TestDataCreator._make_unreadable_csv(
+            unreadable_csv_name=UNREADABLE_CSV_NAME1, unreadable_csv_line=UNREADABLE_CSV_LINE1
+        )
+        TestDataCreator._make_unreadable_csv(
+            unreadable_csv_name=UNREADABLE_CSV_NAME2, unreadable_csv_line=UNREADABLE_CSV_LINE2
+        )
 
     @staticmethod
     def _make_dir1(compress: bool) -> set:
@@ -234,7 +242,8 @@ class TestDataCreator:
         @param txt_path: The path to the txt file to create
         """
 
-        open(txt_path, WRITE_OPT)
+        with open(txt_path, WRITE_OPT):
+            pass
 
     @staticmethod
     def _make_csv(csv_dict: dict, csv_path: str):
@@ -337,6 +346,23 @@ class TestDataCreator:
 
         command: str = REMOVE_COMMAND.format(paths)
         system(command)
+
+    @staticmethod
+    def _make_unreadable_csv(unreadable_csv_name: str, unreadable_csv_line: Union[str, bytes]):
+        """
+        Makes a csv that cannot be read into a data frame
+
+        @param unreadable_csv_name: The name of the unreadable csv to create
+        @param unreadable_csv_line: The contents of the csv
+        """
+
+        write_opt: str = WRITE_OPT
+        if type(unreadable_csv_line) is bytes:
+            write_opt: str = WRITE_BYTES_OPT
+
+        unreadable_csv: str = join(TEST_DATA_PATH, unreadable_csv_name)
+        with open(unreadable_csv, write_opt) as f:
+            f.write(unreadable_csv_line)
 
     def destroy_test_data(self):
         """Removes all the files and folders that are part of the data created for testing"""

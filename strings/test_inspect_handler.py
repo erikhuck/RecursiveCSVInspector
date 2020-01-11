@@ -55,3 +55,9 @@ CSV3_LINE16: str = '\t\tnan: 1'
 CSV3_LINE17: str = '\tmAy'
 CSV3_LINE18: str = '\t\tADNI: 1'
 CSV3_LINE19: str = '\t\t__n-u-m-b-e-r-s__: 2'
+CSV_NOT_LOADED_LINE1: str = '\tThe CSV for this path could not be loaded due to an error of type: ' \
+                           '<class \'pandas.errors.ParserError\'> and with message: Error tokenizing data. C error: ' \
+                           'Expected 16 fields in line 4, saw 17\n'
+CSV_NOT_LOADED_LINE2: str = '\tThe CSV for this path could not be loaded due to an error of type: ' \
+                            '<class \'UnicodeDecodeError\'> and with message: \'utf-8\' codec can\'t decode byte 0x96' \
+                            ' in position 0: invalid start byte'

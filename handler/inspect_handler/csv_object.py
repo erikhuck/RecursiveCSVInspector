@@ -3,10 +3,11 @@
 from collections import Counter, Iterable
 from numpy import isnan, issubdtype, ndarray, number
 from pandas import DataFrame, read_csv, Series
+from pandas.errors import ParserError
 
 from strings.general import CSV_EXTENSION, NAN
 from strings.inspect_handler import (
-    INDENT, MAPPING_SYMBOL, MAX_KEY, MEAN_KEY, MIN_KEY, NUMERIC_TYPE_KEY, RANGE_KEY, STD_KEY
+    CSV_NOT_LOADED_MSG, INDENT, MAPPING_SYMBOL, MAX_KEY, MEAN_KEY, MIN_KEY, NUMERIC_TYPE_KEY, RANGE_KEY, STD_KEY
 )
 
 
@@ -30,10 +31,18 @@ class CSVObject:
         assert csv_path.endswith(CSV_EXTENSION)
 
         self._csv_cols: dict = {}
+        self._read_error: None = None
 
-        df: DataFrame = read_csv(csv_path)
-        for col_name in df.columns:
-            self._csv_cols[col_name] = CSVObject._get_col(df=df, col_name=col_name)
+        try:
+            # Use the "low_memory" parameter to get rid of superfluous warnings
+            df: DataFrame = read_csv(csv_path, low_memory=False)
+        except (ParserError, UnicodeDecodeError) as e:
+            self._read_error: Exception = e
+            df: None = None
+
+        if df is not None:
+            for col_name in df.columns:
+                self._csv_cols[col_name] = CSVObject._get_col(df=df, col_name=col_name)
 
     def get_csv_col_names(self) -> Iterable:
         """Returns the names of all the columns"""
@@ -56,9 +65,16 @@ class CSVObject:
         return nominal_cols
 
     def get_info(self) -> list:
-        """Returns a list of strings containing useful information about the csv file corresponding to this object"""
+        """
+        Returns a list of strings containing useful information about the csv file corresponding to this object.
+        If the csv could not be successfully read, simply returns a string message explaining this.
+        """
 
         csv_obj_info: list = []
+
+        if len(self._csv_cols) == 0:
+            csv_obj_info.append(CSV_NOT_LOADED_MSG.format(type(self._read_error), self._read_error))
+            return csv_obj_info
 
         # Sort the column names to ensure determinism
         col_names: list = sorted(self._csv_cols.keys())
