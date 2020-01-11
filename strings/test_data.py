@@ -53,5 +53,14 @@ TGZ_COMPRESS_COMMAND: str = 'tar -czf {}.tgz {}'
 TXT_EXTENSION: str = '.txt'
 TXT1_NAME: str = '.zip.tar.gz.moca'
 TXT2_NAME: str = 'ADAS'
+UNREADABLE_CSV_LINE1: str = \
+    '''1,1,4,1,b,2,,1,2,3,,,,5,d,
+    1,1,7,1,b,2,,1,2,3,,,,1,
+    1,1,9,1,f,2,,1,2,1,2,,,O,
+    1,1,3,6,s,2,,1,2,7,,,,A,,,'''
+UNREADABLE_CSV_LINE2: bytes = b'\x96'
+UNREADABLE_CSV_NAME1: str = 'unreadable1.csv'
+UNREADABLE_CSV_NAME2: str = 'unreadable2.csv'
 WRITE_OPT: str = 'w'
+WRITE_BYTES_OPT: str = 'wb'
 ZIP_COMPRESS_COMMAND: str = 'zip {}.zip {} > /dev/null'

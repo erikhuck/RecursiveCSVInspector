@@ -1,11 +1,13 @@
 """Module containing the inspect handler test case class"""
 
 from unittest import TestCase
+from pandas.errors import ParserError
 
 from handler.inspect_handler.inspect_handler import InspectHandler
 from handler.master_handler import MasterHandler
 from strings.args import INSPECT_HANDLER_NAME, TEST_KEY_WORD1, TEST_KEY_WORD2, TEST_KEY_WORD3, TEST_KEY_WORD4
 from strings.inspect_handler import NO_OUTPUT_MSG
+from strings.test_data import UNREADABLE_CSV_NAME1, UNREADABLE_CSV_NAME2
 from strings.test_inspect_handler import *
 from test.utils import get_inspect_args, get_master_handler, TestDataCreator
 
@@ -46,6 +48,17 @@ class TestInspectHandler(TestCase):
 
         # Test for a data path with a trailing slash
         self._run_handler(key_words=key_words, expected_output=expected_output, trailing_slash=True)
+
+        # Test attempting to read an unreadable csv that causes a pandas parser error
+        self._test_unreadable_csv(
+            unreadable_csv_name=UNREADABLE_CSV_NAME1, csv_not_loaded_line=CSV_NOT_LOADED_LINE1, error_type=ParserError
+        )
+
+        # Test attempting to read an unreadable csv that causes a unicode decode error
+        self._test_unreadable_csv(
+            unreadable_csv_name=UNREADABLE_CSV_NAME2, csv_not_loaded_line=CSV_NOT_LOADED_LINE2,
+            error_type=UnicodeDecodeError
+        )
 
         creator.destroy_test_data()
 
@@ -139,3 +152,18 @@ class TestInspectHandler(TestCase):
             CSV3_LINE10, CSV3_LINE11, CSV3_LINE12, CSV3_LINE13, CSV3_LINE14, CSV3_LINE15, CSV3_LINE16, CSV3_LINE17,
             CSV3_LINE18, CSV3_LINE19
         ]
+
+    def _test_unreadable_csv(self, unreadable_csv_name: str, csv_not_loaded_line: str, error_type: type):
+        """
+        Tests attempting to read an unreadable csv
+
+        @param unreadable_csv_name: The name of the unreadable csv file
+        @param csv_not_loaded_line: The message that explains that the csv could not be read
+        @param error_type: The type of error that resulted from not being able to read the csv
+        """
+
+        key_words: list = [unreadable_csv_name]
+        expected_output: list = [unreadable_csv_name, csv_not_loaded_line]
+        self._run_handler(key_words=key_words, expected_output=expected_output)
+        e: Exception = InspectHandler._csv_objects[unreadable_csv_name]._read_error
+        self.assertEqual(type(e), error_type)
