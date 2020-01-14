@@ -128,11 +128,14 @@ class NominalColumn(CSVColumn):
 
         # Get the frequency of each class in the nominal column
         for clazz in col:
-            if NominalColumn._is_numeric(obj=clazz):
+            if type(clazz) is bool:
+                clazz: str = str(clazz)
+            elif NominalColumn._is_numeric(obj=clazz):
                 clazz: str = NUMERIC_TYPE_KEY
             elif type(clazz) is float:
                 assert isnan(clazz)
                 clazz: str = NAN
+
             self._class_counts[clazz] += 1
 
     @staticmethod
