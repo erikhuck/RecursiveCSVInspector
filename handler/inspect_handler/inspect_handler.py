@@ -6,7 +6,9 @@ from collections import Iterable
 from handler.handler import Handler
 from handler.inspect_handler.csv_object import CSVObject, NominalColumn
 from handler.utils import remove_root_dir
-from strings.args import KEY_WORDS_ARG, KEY_WORDS_ARG_HELP, STORE_ACTION
+from strings.args import (
+    KEY_WORDS_ARG, KEY_WORDS_ARG_HELP, STORE_ACTION, STORE_TRUE_ACTION, VERBOSE_ARG, VERBOSE_ARG_HELP
+)
 from strings.general import CSV_EXTENSION
 from strings.inspect_handler import NO_OUTPUT_MSG
 
@@ -28,6 +30,7 @@ class InspectHandler(Handler):
 
         Handler.configure_parser(parser)
 
+        parser.add_argument(VERBOSE_ARG, action=STORE_TRUE_ACTION, required=False, help=VERBOSE_ARG_HELP)
         parser.add_argument(KEY_WORDS_ARG, nargs='+', action=STORE_ACTION, required=True, help=KEY_WORDS_ARG_HELP)
 
     @staticmethod
@@ -50,7 +53,7 @@ class InspectHandler(Handler):
         Handler._directory_walk(dir_path=args.data_path, action=InspectHandler._inspect_file)
 
         # Print out all the info in the csv objects
-        info: list = InspectHandler._get_info()
+        info: list = InspectHandler._get_info(verbose=args.verbose)
         for output_line in info:
             print(output_line)
 
@@ -117,10 +120,11 @@ class InspectHandler(Handler):
         return False
 
     @staticmethod
-    def _get_info() -> list:
+    def _get_info(verbose: bool) -> list:
         """
         Creates and returns the information for all the relevant csv files
 
+        @param verbose: Whether to print extra information about the CSV columns rather than just their names
         @return: The list of output lines
         """
 
@@ -135,7 +139,7 @@ class InspectHandler(Handler):
 
         for file_path in file_paths:
             csv_obj: CSVObject = InspectHandler._csv_objects[file_path]
-            csv_obj_info: list = csv_obj.get_info()
+            csv_obj_info: list = csv_obj.get_info(verbose=verbose)
             inspect_handler_info.append(file_path)
             inspect_handler_info.extend(csv_obj_info)
         return inspect_handler_info

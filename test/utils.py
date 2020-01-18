@@ -8,7 +8,7 @@ from typing import Union
 from handler.master_handler import MasterHandler
 from handler.utils import add_trailing_slash
 from strings.extract_handler import GZ_EXTENSION, TAR_EXTENSION, TAR_GZ_EXTENSION, TGZ_EXTENSION, ZIP_EXTENSION
-from strings.args import DATA_PATH_ARG, KEY_WORDS_ARG
+from strings.args import DATA_PATH_ARG, KEY_WORDS_ARG, VERBOSE_ARG
 from strings.general import CSV_EXTENSION, EMPTY_STRING, NAN
 from strings.test_data import *
 
@@ -417,17 +417,21 @@ def get_master_handler(handler_type: str, extra_args: list = None, trailing_slas
     return MasterHandler(argv)
 
 
-def get_inspect_args(key_words: list) -> list:
+def get_inspect_args(key_words: list, verbose: bool = True) -> list:
     """
     Creates the list of arguments especially for the inspect handler, for the purpose of testing
 
     @param key_words: The list of key words to test the inspect handler with
+    @param verbose: Whether to have verbosity or not
     @return: The inspect handler arguments
     """
 
-    argv: list = [
-        KEY_WORDS_ARG
-    ]
+    argv: list = []
 
+    if verbose:
+        argv.append(VERBOSE_ARG)
+
+    argv.append(KEY_WORDS_ARG)
     argv.extend(key_words)
+
     return argv

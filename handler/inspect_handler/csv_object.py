@@ -64,10 +64,13 @@ class CSVObject:
 
         return nominal_cols
 
-    def get_info(self) -> list:
+    def get_info(self, verbose: bool) -> list:
         """
         Returns a list of strings containing useful information about the csv file corresponding to this object.
         If the csv could not be successfully read, simply returns a string message explaining this.
+
+        @param verbose: Whether to print extra information about the CSV columns rather than just their names
+        @return: The list of information
         """
 
         csv_obj_info: list = []
@@ -83,9 +86,10 @@ class CSVObject:
             col_name_line: str = (INDENT * CSVObject.N_INDENTS) + col_name
             csv_obj_info.append(col_name_line)
 
-            col: CSVColumn = self._csv_cols[col_name]
-            csv_col_info: list = col.get_info()
-            csv_obj_info.extend(csv_col_info)
+            if verbose:
+                col: CSVColumn = self._csv_cols[col_name]
+                csv_col_info: list = col.get_info()
+                csv_obj_info.extend(csv_col_info)
         return csv_obj_info
 
     @staticmethod
