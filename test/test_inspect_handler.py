@@ -6,7 +6,7 @@ from pandas.errors import ParserError
 from handler.inspect_handler.inspect_handler import InspectHandler
 from handler.master_handler import MasterHandler
 from strings.args import INSPECT_HANDLER_NAME, TEST_KEY_WORD1, TEST_KEY_WORD2, TEST_KEY_WORD3, TEST_KEY_WORD4
-from strings.inspect_handler import NO_OUTPUT_MSG
+from strings.inspect_handler import INDENT, NO_OUTPUT_MSG
 from strings.test_data import UNREADABLE_CSV_NAME1, UNREADABLE_CSV_NAME2
 from strings.test_inspect_handler import *
 from test.utils import get_inspect_args, get_master_handler, TestDataCreator
@@ -22,22 +22,19 @@ class TestInspectHandler(TestCase):
 
         creator.create_test_data(compress=False)
 
-        """
-        Test for non-cap-sensitivity in a file path, a match in a file path, using multiple key words, a column
-        consisting entirely of floats, a column consisting of both integers and floats, a column consisting of nominal
-        and numeric values, a column consisting of integers and NaNs, a column consisting of floats and NaNs, a column
-        consisting of nominal values and NaNs, a column with only NaNs, and test that a CSV's information is not shown
-        multiple times even if it gets a match in multiple ways
-        """
+        # Test for non-cap-sensitivity in a file path, a match in a file path, using multiple key words, a column
+        # consisting entirely of floats, a column consisting of both integers and floats, a column consisting of nominal
+        # and numeric values, a column consisting of integers and NaNs, a column consisting of floats and NaNs, a column
+        # consisting of nominal values and NaNs, a column with only NaNs, and test that a CSV's information is not shown
+        # multiple times even if it gets a match in multiple ways
         key_words: list = [TEST_KEY_WORD1, TEST_KEY_WORD2]
         expected_output: list = TestInspectHandler._get_expected_output(csv1=False, csv2=True, csv3=True)
         self._run_handler(key_words=key_words, expected_output=expected_output)
 
-        """
-        Test for non-cap-sensitivity in column names and nominal values, matches in column names and nominal values,
-        using a single key word, a column entirely consisting of integers, a nominal column with differing value-counts,
-        a nominal column with all the same value, and a nominal column with integers, floats, nominal values, and NaNs
-        """
+        # Test for non-cap-sensitivity in column names and nominal values, matches in column names and nominal values,
+        # using a single key word, a column entirely consisting of integers, a nominal column with differing
+        # value-counts, a nominal column with all the same value, and a nominal column with integers, floats, nominal
+        # values, and NaNs
         key_words: list = [TEST_KEY_WORD3]
         expected_output: list = TestInspectHandler._get_expected_output(csv1=True, csv2=False, csv3=True)
         self._run_handler(key_words=key_words, expected_output=expected_output)
@@ -60,15 +57,21 @@ class TestInspectHandler(TestCase):
             error_type=UnicodeDecodeError
         )
 
+        # Test verbosity
+        key_words: list = [TEST_KEY_WORD1, TEST_KEY_WORD2, TEST_KEY_WORD3]
+        expected_output: list = TestInspectHandler._get_expected_output(csv1=True, csv2=True, csv3=True, verbose=False)
+        self._run_handler(key_words=key_words, expected_output=expected_output, verbose=False)
+
         creator.destroy_test_data()
 
-    def _run_handler(self, key_words: list, expected_output: list, trailing_slash: bool = False):
+    def _run_handler(self, key_words: list, expected_output: list, trailing_slash: bool = False, verbose: bool = True):
         """
         Runs the inspect handler and tests the output for a given list of key words
 
         @param key_words: The key words for the inspect handler
         @param expected_output: The output to check against
         @param trailing_slash: Whether the test data directory path has a trailing slash at the end of it
+        @param verbose: Whether to include additional CSV information beyond file paths and column names
         """
 
         # Reset the inspect handler
@@ -76,23 +79,24 @@ class TestInspectHandler(TestCase):
         InspectHandler._key_words = None
         InspectHandler._data_path = None
 
-        argv: list = get_inspect_args(key_words=key_words)
+        argv: list = get_inspect_args(key_words=key_words, verbose=verbose)
         master_handler: MasterHandler = get_master_handler(
             handler_type=INSPECT_HANDLER_NAME, extra_args=argv, trailing_slash=trailing_slash
         )
         master_handler.handle()
 
-        actual_output: list = InspectHandler._get_info()
+        actual_output: list = InspectHandler._get_info(verbose=verbose)
         self.assertEqual(actual_output, expected_output)
 
     @staticmethod
-    def _get_expected_output(csv1: bool, csv2: bool, csv3: bool) -> list:
+    def _get_expected_output(csv1: bool, csv2: bool, csv3: bool, verbose: bool = True) -> list:
         """
         Returns the entire expected output of a test case
 
         @param csv1: Whether the first test CSV was relevant
         @param csv2: Whether the second test CSV was relevant
         @param csv3: Whether the third test CSV was relevant
+        @param verbose: Whether to include additional CSV information beyond file paths and column names
         @return: The list of all the output lines
         """
 
@@ -109,6 +113,13 @@ class TestInspectHandler(TestCase):
 
         if csv3:
             expected_output.extend(TestInspectHandler._get_csv3_output())
+
+        if not verbose:
+            for line in list(expected_output):
+                double_indent: str = INDENT + INDENT
+
+                if double_indent in line:
+                    expected_output.remove(line)
 
         return expected_output
 
