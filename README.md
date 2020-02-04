@@ -1,5 +1,11 @@
 # AlzheimersDataInspection
 * The purpose of this repository is to be able to inspect the csv files in the ADNI data set
-* The ADNI data used for this script was downloaded in December 2019
+* The ADNI data used to test this script was downloaded in December 2019
 * It was downloaded at http://adni.loni.usc.edu/
-* The command to run the script is _**TODO: INSERT COMMAND LINE HERE**_
+* Command for recusrisvely extracting all compressed files and directories in your data directory:
+python3 main.py extract --data-path /path/to/data/directory
+* Currently can extract the following file extensions: .tgz, .tar, .gz, .tar.gz, and .zip
+
+* Command for inspecting:
+python3 main.py inspect --data-path /path/to/data/directory --key-words keyword1 keyword2 ...
+* Use the --verbose option to print statistical information about the columns in the CSVs in addition to the column names
