@@ -1,5 +1,5 @@
 # AlzheimersDataInspection
-* The purpose of this repository is to be able to inspect the csv files in the ADNI data set
+* The purpose of this repository is to be able to recursively inspect the csv files in a data directory. Additionally it is capable of recursively extracting and compressed files and directories in a data directory.
 * The ADNI data used to test this script was downloaded in December 2019
 * It was downloaded at http://adni.loni.usc.edu/
 * Command for recusrisvely extracting all compressed files and directories in your data directory:
